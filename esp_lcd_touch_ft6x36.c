@@ -19,64 +19,64 @@
 static const char *TAG = "FT6x36";
 
 /* Registers */
-#define FT6x36_DEVICE_MODE      (0x00)
-#define FT6x36_GESTURE_ID       (0x01)
-#define FT6x36_TOUCH_POINTS     (0x02)
+#define FT6x36_DEVICE_MODE (0x00)
+#define FT6x36_GESTURE_ID (0x01)
+#define FT6x36_TOUCH_POINTS (0x02)
 
-#define FT6x36_TOUCH1_EV_FLAG   (0x03)
-#define FT6x36_TOUCH1_XH        (0x03)
-#define FT6x36_TOUCH1_XL        (0x04)
-#define FT6x36_TOUCH1_YH        (0x05)
-#define FT6x36_TOUCH1_YL        (0x06)
+#define FT6x36_TOUCH1_EV_FLAG (0x03)
+#define FT6x36_TOUCH1_XH (0x03)
+#define FT6x36_TOUCH1_XL (0x04)
+#define FT6x36_TOUCH1_YH (0x05)
+#define FT6x36_TOUCH1_YL (0x06)
 
-#define FT6x36_TOUCH2_EV_FLAG   (0x09)
-#define FT6x36_TOUCH2_XH        (0x09)
-#define FT6x36_TOUCH2_XL        (0x0A)
-#define FT6x36_TOUCH2_YH        (0x0B)
-#define FT6x36_TOUCH2_YL        (0x0C)
+#define FT6x36_TOUCH2_EV_FLAG (0x09)
+#define FT6x36_TOUCH2_XH (0x09)
+#define FT6x36_TOUCH2_XL (0x0A)
+#define FT6x36_TOUCH2_YH (0x0B)
+#define FT6x36_TOUCH2_YL (0x0C)
 
-#define FT6x36_TOUCH3_EV_FLAG   (0x0F)
-#define FT6x36_TOUCH3_XH        (0x0F)
-#define FT6x36_TOUCH3_XL        (0x10)
-#define FT6x36_TOUCH3_YH        (0x11)
-#define FT6x36_TOUCH3_YL        (0x12)
+#define FT6x36_TOUCH3_EV_FLAG (0x0F)
+#define FT6x36_TOUCH3_XH (0x0F)
+#define FT6x36_TOUCH3_XL (0x10)
+#define FT6x36_TOUCH3_YH (0x11)
+#define FT6x36_TOUCH3_YL (0x12)
 
-#define FT6x36_TOUCH4_EV_FLAG   (0x15)
-#define FT6x36_TOUCH4_XH        (0x15)
-#define FT6x36_TOUCH4_XL        (0x16)
-#define FT6x36_TOUCH4_YH        (0x17)
-#define FT6x36_TOUCH4_YL        (0x18)
+#define FT6x36_TOUCH4_EV_FLAG (0x15)
+#define FT6x36_TOUCH4_XH (0x15)
+#define FT6x36_TOUCH4_XL (0x16)
+#define FT6x36_TOUCH4_YH (0x17)
+#define FT6x36_TOUCH4_YL (0x18)
 
-#define FT6x36_TOUCH5_EV_FLAG   (0x1B)
-#define FT6x36_TOUCH5_XH        (0x1B)
-#define FT6x36_TOUCH5_XL        (0x1C)
-#define FT6x36_TOUCH5_YH        (0x1D)
-#define FT6x36_TOUCH5_YL        (0x1E)
+#define FT6x36_TOUCH5_EV_FLAG (0x1B)
+#define FT6x36_TOUCH5_XH (0x1B)
+#define FT6x36_TOUCH5_XL (0x1C)
+#define FT6x36_TOUCH5_YH (0x1D)
+#define FT6x36_TOUCH5_YL (0x1E)
 
-#define FT6x36_ID_G_THGROUP             (0x80)
-#define FT6x36_ID_G_THPEAK              (0x81)
-#define FT6x36_ID_G_THCAL               (0x82)
-#define FT6x36_ID_G_THWATER             (0x83)
-#define FT6x36_ID_G_THTEMP              (0x84)
-#define FT6x36_ID_G_THDIFF              (0x85)
-#define FT6x36_ID_G_CTRL                (0x86)
-#define FT6x36_ID_G_TIME_ENTER_MONITOR  (0x87)
-#define FT6x36_ID_G_PERIODACTIVE        (0x88)
-#define FT6x36_ID_G_PERIODMONITOR       (0x89)
-#define FT6x36_ID_G_AUTO_CLB_MODE       (0xA0)
-#define FT6x36_ID_G_LIB_VERSION_H       (0xA1)
-#define FT6x36_ID_G_LIB_VERSION_L       (0xA2)
-#define FT6x36_ID_G_CIPHER              (0xA3)
-#define FT6x36_ID_G_MODE                (0xA4)
-#define FT6x36_ID_G_PMODE               (0xA5)
-#define FT6x36_ID_G_FIRMID              (0xA6)
-#define FT6x36_ID_G_STATE               (0xA7)
-#define FT6x36_ID_G_FT5201ID            (0xA8)
-#define FT6x36_ID_G_ERR                 (0xA9)
+#define FT6x36_ID_G_THGROUP (0x80)
+#define FT6x36_ID_G_THPEAK (0x81)
+#define FT6x36_ID_G_THCAL (0x82)
+#define FT6x36_ID_G_THWATER (0x83)
+#define FT6x36_ID_G_THTEMP (0x84)
+#define FT6x36_ID_G_THDIFF (0x85)
+#define FT6x36_ID_G_CTRL (0x86)
+#define FT6x36_ID_G_TIME_ENTER_MONITOR (0x87)
+#define FT6x36_ID_G_PERIODACTIVE (0x88)
+#define FT6x36_ID_G_PERIODMONITOR (0x89)
+#define FT6x36_ID_G_AUTO_CLB_MODE (0xA0)
+#define FT6x36_ID_G_LIB_VERSION_H (0xA1)
+#define FT6x36_ID_G_LIB_VERSION_L (0xA2)
+#define FT6x36_ID_G_CIPHER (0xA3)
+#define FT6x36_ID_G_MODE (0xA4)
+#define FT6x36_ID_G_PMODE (0xA5)
+#define FT6x36_ID_G_FIRMID (0xA6)
+#define FT6x36_ID_G_STATE (0xA7)
+#define FT6x36_ID_G_FT5201ID (0xA8)
+#define FT6x36_ID_G_ERR (0xA9)
 
 /*******************************************************************************
-* Function definitions
-*******************************************************************************/
+ * Function definitions
+ *******************************************************************************/
 static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp);
 static bool esp_lcd_touch_ft6x36_get_xy(esp_lcd_touch_handle_t tp, uint16_t *x, uint16_t *y, uint16_t *strength, uint8_t *point_num, uint8_t max_point_num);
 static esp_err_t esp_lcd_touch_ft6x36_del(esp_lcd_touch_handle_t tp);
@@ -91,8 +91,8 @@ static esp_err_t touch_ft6x36_init(esp_lcd_touch_handle_t tp);
 static esp_err_t touch_ft6x36_reset(esp_lcd_touch_handle_t tp);
 
 /*******************************************************************************
-* Public API functions
-*******************************************************************************/
+ * Public API functions
+ *******************************************************************************/
 
 esp_err_t esp_lcd_touch_new_i2c_ft6x36(const esp_lcd_panel_io_handle_t io, const esp_lcd_touch_config_t *config, esp_lcd_touch_handle_t *out_touch)
 {
@@ -120,27 +120,28 @@ esp_err_t esp_lcd_touch_new_i2c_ft6x36(const esp_lcd_panel_io_handle_t io, const
     memcpy(&esp_lcd_touch_ft6x36->config, config, sizeof(esp_lcd_touch_config_t));
 
     /* Prepare pin for touch interrupt */
-    if (esp_lcd_touch_ft6x36->config.int_gpio_num != GPIO_NUM_NC) {
+    if (esp_lcd_touch_ft6x36->config.int_gpio_num != GPIO_NUM_NC)
+    {
         const gpio_config_t int_gpio_config = {
             .mode = GPIO_MODE_INPUT,
             .intr_type = (esp_lcd_touch_ft6x36->config.levels.interrupt ? GPIO_INTR_POSEDGE : GPIO_INTR_NEGEDGE),
-            .pin_bit_mask = BIT64(esp_lcd_touch_ft6x36->config.int_gpio_num)
-        };
+            .pin_bit_mask = BIT64(esp_lcd_touch_ft6x36->config.int_gpio_num)};
         ret = gpio_config(&int_gpio_config);
         ESP_GOTO_ON_ERROR(ret, err, TAG, "GPIO config failed");
 
         /* Register interrupt callback */
-        if (esp_lcd_touch_ft6x36->config.interrupt_callback) {
+        if (esp_lcd_touch_ft6x36->config.interrupt_callback)
+        {
             esp_lcd_touch_register_interrupt_callback(esp_lcd_touch_ft6x36, esp_lcd_touch_ft6x36->config.interrupt_callback);
         }
     }
 
     /* Prepare pin for touch controller reset */
-    if (esp_lcd_touch_ft6x36->config.rst_gpio_num != GPIO_NUM_NC) {
+    if (esp_lcd_touch_ft6x36->config.rst_gpio_num != GPIO_NUM_NC)
+    {
         const gpio_config_t rst_gpio_config = {
             .mode = GPIO_MODE_OUTPUT,
-            .pin_bit_mask = BIT64(esp_lcd_touch_ft6x36->config.rst_gpio_num)
-        };
+            .pin_bit_mask = BIT64(esp_lcd_touch_ft6x36->config.rst_gpio_num)};
         ret = gpio_config(&rst_gpio_config);
         ESP_GOTO_ON_ERROR(ret, err, TAG, "GPIO config failed");
     }
@@ -156,9 +157,11 @@ esp_err_t esp_lcd_touch_new_i2c_ft6x36(const esp_lcd_panel_io_handle_t io, const
     *out_touch = esp_lcd_touch_ft6x36;
 
 err:
-    if (ret != ESP_OK) {
+    if (ret != ESP_OK)
+    {
         ESP_LOGE(TAG, "Error (0x%x)! Touch controller FT6x36 initialization failed!", ret);
-        if (esp_lcd_touch_ft6x36) {
+        if (esp_lcd_touch_ft6x36)
+        {
             esp_lcd_touch_ft6x36_del(esp_lcd_touch_ft6x36);
         }
     }
@@ -178,7 +181,8 @@ static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp)
     err = touch_ft6x36_i2c_read(tp, FT6x36_TOUCH_POINTS, &points, 1);
     ESP_RETURN_ON_ERROR(err, TAG, "I2C read error!");
 
-    if (points > 5 || points == 0) {
+    if (points > 5 || points == 0)
+    {
         return ESP_OK;
     }
 
@@ -194,7 +198,8 @@ static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp)
     tp->data.points = points;
 
     /* Fill all coordinates */
-    for (i = 0; i < points; i++) {
+    for (i = 0; i < points; i++)
+    {
         tp->data.coords[i].x = (((uint16_t)data[(i * 6) + 0] & 0x0f) << 8) + data[(i * 6) + 1];
         tp->data.coords[i].y = (((uint16_t)data[(i * 6) + 2] & 0x0f) << 8) + data[(i * 6) + 3];
     }
@@ -217,11 +222,13 @@ static bool esp_lcd_touch_ft6x36_get_xy(esp_lcd_touch_handle_t tp, uint16_t *x, 
     /* Count of points */
     *point_num = (tp->data.points > max_point_num ? max_point_num : tp->data.points);
 
-    for (size_t i = 0; i < *point_num; i++) {
+    for (size_t i = 0; i < *point_num; i++)
+    {
         x[i] = tp->data.coords[i].x;
         y[i] = tp->data.coords[i].y;
 
-        if (strength) {
+        if (strength)
+        {
             strength[i] = tp->data.coords[i].strength;
         }
     }
@@ -239,15 +246,18 @@ static esp_err_t esp_lcd_touch_ft6x36_del(esp_lcd_touch_handle_t tp)
     assert(tp != NULL);
 
     /* Reset GPIO pin settings */
-    if (tp->config.int_gpio_num != GPIO_NUM_NC) {
+    if (tp->config.int_gpio_num != GPIO_NUM_NC)
+    {
         gpio_reset_pin(tp->config.int_gpio_num);
-        if (tp->config.interrupt_callback) {
+        if (tp->config.interrupt_callback)
+        {
             gpio_isr_handler_remove(tp->config.int_gpio_num);
         }
     }
 
     /* Reset GPIO pin settings */
-    if (tp->config.rst_gpio_num != GPIO_NUM_NC) {
+    if (tp->config.rst_gpio_num != GPIO_NUM_NC)
+    {
         gpio_reset_pin(tp->config.rst_gpio_num);
     }
 
@@ -257,8 +267,8 @@ static esp_err_t esp_lcd_touch_ft6x36_del(esp_lcd_touch_handle_t tp)
 }
 
 /*******************************************************************************
-* Private API function
-*******************************************************************************/
+ * Private API function
+ *******************************************************************************/
 
 static esp_err_t touch_ft6x36_init(esp_lcd_touch_handle_t tp)
 {
@@ -299,7 +309,8 @@ static esp_err_t touch_ft6x36_reset(esp_lcd_touch_handle_t tp)
 {
     assert(tp != NULL);
 
-    if (tp->config.rst_gpio_num != GPIO_NUM_NC) {
+    if (tp->config.rst_gpio_num != GPIO_NUM_NC)
+    {
         ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, tp->config.levels.reset), TAG, "GPIO set level error!");
         vTaskDelay(pdMS_TO_TICKS(10));
         ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, !tp->config.levels.reset), TAG, "GPIO set level error!");
