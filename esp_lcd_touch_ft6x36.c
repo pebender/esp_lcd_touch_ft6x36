@@ -19,60 +19,29 @@
 static const char *TAG = "FT6x36";
 
 /* Registers */
-#define FT6x36_DEVICE_MODE (0x00)
-#define FT6x36_GESTURE_ID (0x01)
-#define FT6x36_TOUCH_POINTS (0x02)
+#define FT62XX_G_FT5201ID 0xA8     //!< FocalTech's panel ID
+#define FT62XX_REG_NUMTOUCHES 0x02 //!< Number of touch points
 
-#define FT6x36_TOUCH1_EV_FLAG (0x03)
-#define FT6x36_TOUCH1_XH (0x03)
-#define FT6x36_TOUCH1_XL (0x04)
-#define FT6x36_TOUCH1_YH (0x05)
-#define FT6x36_TOUCH1_YL (0x06)
+#define FT62XX_NUM_X 0x33 //!< Touch X position
+#define FT62XX_NUM_Y 0x34 //!< Touch Y position
 
-#define FT6x36_TOUCH2_EV_FLAG (0x09)
-#define FT6x36_TOUCH2_XH (0x09)
-#define FT6x36_TOUCH2_XL (0x0A)
-#define FT6x36_TOUCH2_YH (0x0B)
-#define FT6x36_TOUCH2_YL (0x0C)
+#define FT62XX_REG_MODE 0x00        //!< Device mode, either WORKING or FACTORY
+#define FT62XX_REG_CALIBRATE 0x02   //!< Calibrate mode
+#define FT62XX_REG_WORKMODE 0x00    //!< Work mode
+#define FT62XX_REG_FACTORYMODE 0x40 //!< Factory mode
+#define FT62XX_REG_THRESHHOLD 0x80  //!< Threshold for touch detection
+#define FT62XX_REG_POINTRATE 0x88   //!< Point rate
+#define FT62XX_REG_FIRMVERS 0xA6    //!< Firmware version
+#define FT62XX_REG_CHIPID 0xA3      //!< Chip selecting
+#define FT62XX_REG_VENDID 0xA8      //!< FocalTech's panel ID
 
-#define FT6x36_TOUCH3_EV_FLAG (0x0F)
-#define FT6x36_TOUCH3_XH (0x0F)
-#define FT6x36_TOUCH3_XL (0x10)
-#define FT6x36_TOUCH3_YH (0x11)
-#define FT6x36_TOUCH3_YL (0x12)
+#define FT62XX_VENDID 0x11  //!< FocalTech's panel ID
+#define FT6206_CHIPID 0x06  //!< Chip selecting
+#define FT6236_CHIPID 0x36  //!< Chip selecting
+#define FT6236U_CHIPID 0x64 //!< Chip selecting
+#define FT6336U_CHIPID 0x64 //!< Chip selecting
 
-#define FT6x36_TOUCH4_EV_FLAG (0x15)
-#define FT6x36_TOUCH4_XH (0x15)
-#define FT6x36_TOUCH4_XL (0x16)
-#define FT6x36_TOUCH4_YH (0x17)
-#define FT6x36_TOUCH4_YL (0x18)
-
-#define FT6x36_TOUCH5_EV_FLAG (0x1B)
-#define FT6x36_TOUCH5_XH (0x1B)
-#define FT6x36_TOUCH5_XL (0x1C)
-#define FT6x36_TOUCH5_YH (0x1D)
-#define FT6x36_TOUCH5_YL (0x1E)
-
-#define FT6x36_ID_G_THGROUP (0x80)
-#define FT6x36_ID_G_THPEAK (0x81)
-#define FT6x36_ID_G_THCAL (0x82)
-#define FT6x36_ID_G_THWATER (0x83)
-#define FT6x36_ID_G_THTEMP (0x84)
-#define FT6x36_ID_G_THDIFF (0x85)
-#define FT6x36_ID_G_CTRL (0x86)
-#define FT6x36_ID_G_TIME_ENTER_MONITOR (0x87)
-#define FT6x36_ID_G_PERIODACTIVE (0x88)
-#define FT6x36_ID_G_PERIODMONITOR (0x89)
-#define FT6x36_ID_G_AUTO_CLB_MODE (0xA0)
-#define FT6x36_ID_G_LIB_VERSION_H (0xA1)
-#define FT6x36_ID_G_LIB_VERSION_L (0xA2)
-#define FT6x36_ID_G_CIPHER (0xA3)
-#define FT6x36_ID_G_MODE (0xA4)
-#define FT6x36_ID_G_PMODE (0xA5)
-#define FT6x36_ID_G_FIRMID (0xA6)
-#define FT6x36_ID_G_STATE (0xA7)
-#define FT6x36_ID_G_FT5201ID (0xA8)
-#define FT6x36_ID_G_ERR (0xA9)
+#define FT62XX_DEFAULT_THRESHOLD 128 //!< Default threshold for touch detection
 
 /*******************************************************************************
  * Function definitions
@@ -172,16 +141,16 @@ err:
 static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp)
 {
     esp_err_t err;
-    uint8_t data[30];
-    uint8_t points;
+    uint8_t data[16];
+    uint8_t points, touches;
     size_t i = 0;
 
     assert(tp != NULL);
 
-    err = touch_ft6x36_i2c_read(tp, FT6x36_TOUCH_POINTS, &points, 1);
+    err = touch_ft6x36_i2c_read(tp, FT62XX_REG_NUMTOUCHES, &points, 1);
     ESP_RETURN_ON_ERROR(err, TAG, "I2C read error!");
 
-    if (points > 5 || points == 0)
+    if (points > 2 || points == 0)
     {
         return ESP_OK;
     }
@@ -189,19 +158,41 @@ static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp)
     /* Number of touched points */
     points = (points > CONFIG_ESP_LCD_TOUCH_MAX_POINTS ? CONFIG_ESP_LCD_TOUCH_MAX_POINTS : points);
 
-    err = touch_ft6x36_i2c_read(tp, FT6x36_TOUCH1_XH, data, 6 * points);
+    // 打印触摸点数量
+    ESP_LOGI(TAG, "Number of touched points: %d", points);
+
+    err = touch_ft6x36_i2c_read(tp, FT62XX_REG_MODE, data, 16);
     ESP_RETURN_ON_ERROR(err, TAG, "I2C read error!");
 
+    // 打印触摸点数据
+    ESP_LOGI(TAG, "Touch data:");
+    char buffer[100];
+    for (i = 0; i < 16; i++)
+    {
+        snprintf(buffer, sizeof(buffer), "0x%02X ", data[i]);
+    }
+    ESP_LOGI(TAG, "%s", buffer);
+
     portENTER_CRITICAL(&tp->data.lock);
+
+    touches = data[0x02];
+
+    points = (touches > CONFIG_ESP_LCD_TOUCH_MAX_POINTS ? CONFIG_ESP_LCD_TOUCH_MAX_POINTS : touches);
 
     /* Number of touched points */
     tp->data.points = points;
 
+    // 打印触摸点数量
+    ESP_LOGI(TAG, "Number of touched points: %d", points);
+
     /* Fill all coordinates */
     for (i = 0; i < points; i++)
     {
-        tp->data.coords[i].x = (((uint16_t)data[(i * 6) + 0] & 0x0f) << 8) + data[(i * 6) + 1];
-        tp->data.coords[i].y = (((uint16_t)data[(i * 6) + 2] & 0x0f) << 8) + data[(i * 6) + 3];
+        tp->data.coords[i].x = ((data[0x03 + i * 6] & 0x0F) << 8) | data[0x04 + i * 6];
+        tp->data.coords[i].y = ((data[0x05 + i * 6] & 0x0F) << 8) | data[0x06 + i * 6];
+
+        // 打印触摸点坐标
+        ESP_LOGI(TAG, "Touch point %d: X = %d, Y = %d", i, tp->data.coords[i].x, tp->data.coords[i].y);
     }
 
     portEXIT_CRITICAL(&tp->data.lock);
@@ -273,33 +264,59 @@ static esp_err_t esp_lcd_touch_ft6x36_del(esp_lcd_touch_handle_t tp)
 static esp_err_t touch_ft6x36_init(esp_lcd_touch_handle_t tp)
 {
     esp_err_t ret = ESP_OK;
+    uint8_t vend_id, chip_id, firm_vers, point_rate, thresh, reg_val;
 
-    // Valid touching detect threshold
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_THGROUP, 70);
+    assert(tp != NULL);
 
-    // valid touching peak detect threshold
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_THPEAK, 60);
+    // 读取供应商ID
+    ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_VENDID, &vend_id, 1), TAG, "Read vendor ID error");
+    // 读取芯片ID
+    ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_CHIPID, &chip_id, 1), TAG, "Read chip ID error");
+    // 读取固件版本
+    ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_FIRMVERS, &firm_vers, 1), TAG, "Read firmware version error");
+    // 读取点速率
+    ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_POINTRATE, &point_rate, 1), TAG, "Read point rate error");
+    // 读取触摸阈值
+    ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_THRESHHOLD, &thresh, 1), TAG, "Read threshold error");
 
-    // Touch focus threshold
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_THCAL, 16);
+    // 打印寄存器信息
+    ESP_LOGI(TAG, "Vend ID: 0x%02X", vend_id);
+    ESP_LOGI(TAG, "Chip ID: 0x%02X", chip_id);
+    ESP_LOGI(TAG, "Firm V: %d", firm_vers);
+    ESP_LOGI(TAG, "Point Rate Hz: %d", point_rate);
+    ESP_LOGI(TAG, "Thresh: %d", thresh);
 
-    // threshold when there is surface water
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_THWATER, 60);
+    // dump所有寄存器 (0x00-0x0F)
+    ESP_LOGI(TAG, "Dumping all registers:");
+    for (int16_t i = 0; i < 0x10; i++)
+    {
+        // 读取寄存器值
+        if (touch_ft6x36_i2c_read(tp, i, &reg_val, 1) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "I2C $%02X = 0x%02X", i, reg_val);
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to read register 0x%02X", i);
+        }
+    }
 
-    // threshold of temperature compensation
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_THTEMP, 10);
+    // 检查供应商ID
+    if (vend_id != FT62XX_VENDID)
+    {
+        ESP_LOGE(TAG, "Invalid vendor ID: 0x%02X", vend_id);
+        return ESP_FAIL;
+    }
 
-    // Touch difference threshold
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_THDIFF, 20);
+    // 检查芯片ID
+    if (chip_id != FT6206_CHIPID && chip_id != FT6236_CHIPID && chip_id != FT6236U_CHIPID && chip_id != FT6336U_CHIPID)
+    {
+        ESP_LOGE(TAG, "Unsupported chip ID: 0x%02X", chip_id);
+        return ESP_FAIL;
+    }
 
-    // Delay to enter 'Monitor' status (s)
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_TIME_ENTER_MONITOR, 2);
-
-    // Period of 'Active' status (ms)
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_PERIODACTIVE, 12);
-
-    // Timer to enter 'idle' when in 'Monitor' (ms)
-    ret |= touch_ft6x36_i2c_write(tp, FT6x36_ID_G_PERIODMONITOR, 40);
+    // 设置阈值
+    ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_THRESHHOLD, FT62XX_DEFAULT_THRESHOLD);
 
     return ret;
 }
