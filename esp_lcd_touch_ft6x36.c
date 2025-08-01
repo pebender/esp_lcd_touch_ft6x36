@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2025 CFSoft Systems (Chengdu) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,31 +19,31 @@
 static const char *TAG = "FT6x36";
 
 /* Registers */
-#define FT62XX_G_FT5201ID 0xA8     //!< FocalTech's panel ID
-#define FT62XX_REG_NUMTOUCHES 0x02 //!< Number of touch points
+#define FT62XX_G_FT5201ID 0xA8     // FocalTech's panel ID
+#define FT62XX_REG_NUMTOUCHES 0x02 // Number of touch points
 
-#define FT62XX_NUM_X 0x33 //!< Touch X position
-#define FT62XX_NUM_Y 0x34 //!< Touch Y position
+#define FT62XX_NUM_X 0x33 // Touch X position
+#define FT62XX_NUM_Y 0x34 // Touch Y position
 
-#define FT62XX_REG_MODE 0x00        //!< Device mode, either WORKING or FACTORY
-#define FT62XX_REG_READDATA 0x00    //!< Read data from register
-#define FT62XX_REG_CALIBRATE 0x02   //!< Calibrate mode
-#define FT62XX_REG_WORKMODE 0x00    //!< Work mode
-#define FT62XX_REG_FACTORYMODE 0x40 //!< Factory mode
-#define FT62XX_REG_THRESHHOLD 0x80  //!< Threshold for touch detection
-#define FT62XX_REG_POINTRATE 0x88   //!< Point rate
-#define FT62XX_REG_FIRMVERS 0xA6    //!< Firmware version
-#define FT62XX_REG_CHIPID 0xA3      //!< Chip selecting
-#define FT62XX_REG_VENDID 0xA8      //!< FocalTech's panel ID
+#define FT62XX_REG_MODE 0x00        // Device mode, either WORKING or FACTORY
+#define FT62XX_REG_READDATA 0x00    // Read data from register
+#define FT62XX_REG_CALIBRATE 0x02   // Calibrate mode
+#define FT62XX_REG_WORKMODE 0x00    // Work mode
+#define FT62XX_REG_FACTORYMODE 0x40 // Factory mode
+#define FT62XX_REG_THRESHHOLD 0x80  // Threshold for touch detection
+#define FT62XX_REG_POINTRATE 0x88   // Point rate
+#define FT62XX_REG_FIRMVERS 0xA6    // Firmware version
+#define FT62XX_REG_CHIPID 0xA3      // Chip selecting
+#define FT62XX_REG_VENDID 0xA8      // FocalTech's panel ID
 
-#define FT62XX_VENDID 0x11  //!< FocalTech's panel ID
-#define FT6206_CHIPID 0x06  //!< Chip selecting
-#define FT3236_CHIPID 0x33  //!< Chip selecting
-#define FT6236_CHIPID 0x36  //!< Chip selecting
-#define FT6236U_CHIPID 0x64 //!< Chip selecting
-#define FT6336U_CHIPID 0x64 //!< Chip selecting
+#define FT62XX_VENDID 0x11  // FocalTech's panel ID
+#define FT6206_CHIPID 0x06  // Chip selecting
+#define FT3236_CHIPID 0x33  // Chip selecting
+#define FT6236_CHIPID 0x36  // Chip selecting
+#define FT6236U_CHIPID 0x64 // Chip selecting
+#define FT6336U_CHIPID 0x64 // Chip selecting
 
-#define FT62XX_DEFAULT_THRESHOLD 128 //!< Default threshold for touch detection
+#define FT62XX_DEFAULT_THRESHOLD 128 // Default threshold for touch detection
 
 /*******************************************************************************
  * Function definitions
@@ -149,6 +149,7 @@ static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp)
 
     assert(tp != NULL);
 
+    /* Read number of touched points */
     err = touch_ft6x36_i2c_read(tp, FT62XX_REG_NUMTOUCHES, &points, 1);
     ESP_RETURN_ON_ERROR(err, TAG, "I2C read error!");
 
@@ -257,29 +258,33 @@ static esp_err_t touch_ft6x36_init(esp_lcd_touch_handle_t tp)
 
     assert(tp != NULL);
 
-    // 读取供应商ID
+    /* Read vendor ID */
     ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_VENDID, &vend_id, 1), TAG, "Read vendor ID error");
-    // 读取芯片ID
+
+    /* Read chip ID */
     ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_CHIPID, &chip_id, 1), TAG, "Read chip ID error");
-    // 读取固件版本
+
+    /* Read firmware version */
     ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_FIRMVERS, &firm_vers, 1), TAG, "Read firmware version error");
-    // 读取点速率
+
+    /* Read point rate */
     ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_POINTRATE, &point_rate, 1), TAG, "Read point rate error");
-    // 读取触摸阈值
+
+    /* Read threshold */
     ESP_RETURN_ON_ERROR(touch_ft6x36_i2c_read(tp, FT62XX_REG_THRESHHOLD, &thresh, 1), TAG, "Read threshold error");
 
-    // 打印寄存器信息
+    /* Print out the values */
     ESP_LOGI(TAG, "Vend ID: 0x%02X", vend_id);
     ESP_LOGI(TAG, "Chip ID: 0x%02X", chip_id);
     ESP_LOGI(TAG, "Firm V: %d", firm_vers);
     ESP_LOGI(TAG, "Point Rate Hz: %d", point_rate);
     ESP_LOGI(TAG, "Thresh: %d", thresh);
 
-    // dump所有寄存器 (0x00-0x0F)
+    /* Dump all registers */
     ESP_LOGI(TAG, "Dumping all registers:");
     for (int16_t i = 0; i < 0x10; i++)
     {
-        // 读取寄存器值
+        /* Read register */
         if (touch_ft6x36_i2c_read(tp, i, &reg_val, 1) == ESP_OK)
         {
             ESP_LOGI(TAG, "I2C $%02X = 0x%02X", i, reg_val);
@@ -290,27 +295,27 @@ static esp_err_t touch_ft6x36_init(esp_lcd_touch_handle_t tp)
         }
     }
 
-    // 检查供应商ID
+    /* Check if the values are valid */
     if (vend_id != FT62XX_VENDID)
     {
         ESP_LOGE(TAG, "Invalid vendor ID: 0x%02X", vend_id);
         return ESP_FAIL;
     }
 
-    // 检查芯片ID
+    /* Check if the chip ID is supported */
     if (chip_id != FT6206_CHIPID && chip_id != FT6236_CHIPID && chip_id != FT6236U_CHIPID && chip_id != FT6336U_CHIPID && chip_id != FT3236_CHIPID)
     {
         ESP_LOGE(TAG, "Unsupported chip ID: 0x%02X", chip_id);
         return ESP_FAIL;
     }
 
-    // 设置工作模式
+    /* Set to work mode */
     ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_MODE, FT62XX_REG_WORKMODE);
 
-    // 设置阈值
+    /* Set threshold */
     ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_THRESHHOLD, FT62XX_DEFAULT_THRESHOLD);
 
-    // 设置点率
+    /* Set point rate */
     ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_POINTRATE, 0x0E);
 
     return ret;
