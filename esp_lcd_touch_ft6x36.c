@@ -26,6 +26,7 @@ static const char *TAG = "FT6x36";
 #define FT62XX_NUM_Y 0x34 //!< Touch Y position
 
 #define FT62XX_REG_MODE 0x00        //!< Device mode, either WORKING or FACTORY
+#define FT62XX_REG_READDATA 0x00    //!< Read data from register
 #define FT62XX_REG_CALIBRATE 0x02   //!< Calibrate mode
 #define FT62XX_REG_WORKMODE 0x00    //!< Work mode
 #define FT62XX_REG_FACTORYMODE 0x40 //!< Factory mode
@@ -37,6 +38,7 @@ static const char *TAG = "FT6x36";
 
 #define FT62XX_VENDID 0x11  //!< FocalTech's panel ID
 #define FT6206_CHIPID 0x06  //!< Chip selecting
+#define FT3236_CHIPID 0x33  //!< Chip selecting
 #define FT6236_CHIPID 0x36  //!< Chip selecting
 #define FT6236U_CHIPID 0x64 //!< Chip selecting
 #define FT6336U_CHIPID 0x64 //!< Chip selecting
@@ -158,41 +160,28 @@ static esp_err_t esp_lcd_touch_ft6x36_read_data(esp_lcd_touch_handle_t tp)
     /* Number of touched points */
     points = (points > CONFIG_ESP_LCD_TOUCH_MAX_POINTS ? CONFIG_ESP_LCD_TOUCH_MAX_POINTS : points);
 
-    // 打印触摸点数量
-    ESP_LOGI(TAG, "Number of touched points: %d", points);
-
-    err = touch_ft6x36_i2c_read(tp, FT62XX_REG_MODE, data, 16);
+    err = touch_ft6x36_i2c_read(tp, FT62XX_REG_READDATA, data, 16);
     ESP_RETURN_ON_ERROR(err, TAG, "I2C read error!");
 
-    // 打印触摸点数据
-    ESP_LOGI(TAG, "Touch data:");
-    char buffer[100];
-    for (i = 0; i < 16; i++)
+    /* Number of touched points */
+    touches = data[0x02];
+
+    /* Check if the number of touched points is correct */
+    if (points != touches)
     {
-        snprintf(buffer, sizeof(buffer), "0x%02X ", data[i]);
+        return ESP_OK;
     }
-    ESP_LOGI(TAG, "%s", buffer);
 
     portENTER_CRITICAL(&tp->data.lock);
 
-    touches = data[0x02];
-
-    points = (touches > CONFIG_ESP_LCD_TOUCH_MAX_POINTS ? CONFIG_ESP_LCD_TOUCH_MAX_POINTS : touches);
-
     /* Number of touched points */
     tp->data.points = points;
-
-    // 打印触摸点数量
-    ESP_LOGI(TAG, "Number of touched points: %d", points);
 
     /* Fill all coordinates */
     for (i = 0; i < points; i++)
     {
         tp->data.coords[i].x = ((data[0x03 + i * 6] & 0x0F) << 8) | data[0x04 + i * 6];
         tp->data.coords[i].y = ((data[0x05 + i * 6] & 0x0F) << 8) | data[0x06 + i * 6];
-
-        // 打印触摸点坐标
-        ESP_LOGI(TAG, "Touch point %d: X = %d, Y = %d", i, tp->data.coords[i].x, tp->data.coords[i].y);
     }
 
     portEXIT_CRITICAL(&tp->data.lock);
@@ -309,14 +298,20 @@ static esp_err_t touch_ft6x36_init(esp_lcd_touch_handle_t tp)
     }
 
     // 检查芯片ID
-    if (chip_id != FT6206_CHIPID && chip_id != FT6236_CHIPID && chip_id != FT6236U_CHIPID && chip_id != FT6336U_CHIPID)
+    if (chip_id != FT6206_CHIPID && chip_id != FT6236_CHIPID && chip_id != FT6236U_CHIPID && chip_id != FT6336U_CHIPID && chip_id != FT3236_CHIPID)
     {
         ESP_LOGE(TAG, "Unsupported chip ID: 0x%02X", chip_id);
         return ESP_FAIL;
     }
 
+    // 设置工作模式
+    ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_MODE, FT62XX_REG_WORKMODE);
+
     // 设置阈值
     ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_THRESHHOLD, FT62XX_DEFAULT_THRESHOLD);
+
+    // 设置点率
+    ret |= touch_ft6x36_i2c_write(tp, FT62XX_REG_POINTRATE, 0x0E);
 
     return ret;
 }
