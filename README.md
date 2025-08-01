@@ -2,6 +2,8 @@
 
 [![Component Registry](https://components.espressif.com/components/espressif/esp_lcd_touch_ft6x36/badge.svg)](https://components.espressif.com/components/cfscn/esp_lcd_touch_ft6x36)
 
+This repository is forked from espressif/esp_lcd_touch_ft5x06
+
 Implementation of the FT6x36 touch controller with esp_lcd_touch component.
 
 | Touch controller | Communication interface | Component name | Link to datasheet |
