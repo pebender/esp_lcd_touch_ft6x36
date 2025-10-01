@@ -329,9 +329,13 @@ static esp_err_t touch_ft6x36_reset(esp_lcd_touch_handle_t tp)
     if (tp->config.rst_gpio_num != GPIO_NUM_NC)
     {
         ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, tp->config.levels.reset), TAG, "GPIO set level error!");
+	/* The data sheet specifies reset must be low for a minimum of 5ms. */
         vTaskDelay(pdMS_TO_TICKS(10));
         ESP_RETURN_ON_ERROR(gpio_set_level(tp->config.rst_gpio_num, !tp->config.levels.reset), TAG, "GPIO set level error!");
-        vTaskDelay(pdMS_TO_TICKS(10));
+	/* The data sheet doesn't specify a minimum value. The data sheet says that the hardware may start reporting
+	 * values as soon as 300ms after the falling edge of reset. And my FT6336U based hardware needs at least 130ms
+	 * after the falling edge of reset before I2C reads return non-zero values, 200ms seems like a good compromise. */
+        vTaskDelay(pdMS_TO_TICKS(200 - 10));
     }
 
     return ESP_OK;
